@@ -47,8 +47,6 @@ function App() {
       children: [],
     } as TreeNode);
 
-    console.log(newTree);
-
     if (newTree) {
       setTree(newTree);
     }

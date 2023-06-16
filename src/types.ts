@@ -1,4 +1,10 @@
 export interface TreeNode {
+  id: string;
   name: string;
-  children?: TreeNode[];
+  children: TreeNode[];
+}
+
+export interface NodePayload {
+  parentId: string;
+  name: string;
 }

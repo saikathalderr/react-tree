@@ -1,33 +1,72 @@
+import { nanoid } from "nanoid";
 import { useState } from "react";
-import { TreeNode } from "./types";
+
+import { NodePayload, TreeNode } from "./types";
 import Card from "./components/Card";
+
+function bfs(id: string, tree: TreeNode | TreeNode[], node: TreeNode) {
+  const queue: TreeNode[] = [];
+
+  queue.unshift(tree as TreeNode);
+
+  while (queue.length > 0) {
+    const curNode = queue.pop();
+
+    if (!curNode) {
+      return;
+    }
+
+    if (curNode.id === id) {
+      curNode.children.push(node);
+
+      return { ...tree };
+    }
+
+    const len = curNode.children.length;
+
+    for (let i = 0; i < len; i++) {
+      queue.unshift(curNode.children[i]);
+    }
+  }
+}
 
 function App() {
   const seedValue: TreeNode = {
-    name: "Hello React",
+    id: nanoid(),
+    name: "Root",
     children: [],
   };
-  const [tree, setTree] = useState<TreeNode[]>([seedValue]);
+  const [tree, setTree] = useState<TreeNode | TreeNode[]>(seedValue);
 
-  const addToTree = (payload: string) => {
-    const newNode: TreeNode = {
-      name: payload,
+  const addToTree = (payload: NodePayload) => {
+    const { name, parentId } = payload;
+
+    const newTree = bfs(parentId, tree, {
+      id: nanoid(),
+      name,
       children: [],
-    };
-    setTree((prevTree) => [...prevTree, newNode]);
+    } as TreeNode);
+
+    console.log(newTree);
+
+    if (newTree) {
+      setTree(newTree);
+    }
   };
 
   return (
-    <div>
-      {tree.map((node, idx) => {
-        return (
+    <div className="p-10">
+      <div className="flex flex-col justify-start items-start">
+        {tree && (
           <Card
             onCardClick={addToTree}
-            name={node.name}
-            key={idx + 1 + "-node"}
+            children={(tree as TreeNode).children}
+            name={(tree as TreeNode).name}
+            id={(tree as TreeNode).id}
+            key={(tree as TreeNode).id}
           />
-        );
-      })}
+        )}
+      </div>
     </div>
   );
 }
